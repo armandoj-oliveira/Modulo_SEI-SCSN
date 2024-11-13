@@ -37,14 +37,29 @@ function btnActionAutenticate() {
 }
 
 function btnActionAnalyze() {
-    const btnAnalyze = document.getElementById('btnAnalyze')
+    const btnAnalyze = document.getElementById('btnAnalyze');
     
     if(btnAnalyze) {
         btnAnalyze.addEventListener("click", function () {
-            window.alert("DEU CERTO");
+            analyzeModal();
         });
     } else {
         errorModal("Algo deu errado!");
+    }
+}
+
+function valueCheckbox() {
+    const btnContinue = document.getElementById('btnContinue');
+    const checkbox = document.querySelectorAll('input[type="checkbox"]');
+
+    if(btnContinue){
+        btnContinue.addEventListener("click", function () {
+            for(let i = 0; i < checkbox.length; i++) {
+                if(checkbox[i].checked) {
+                    console.log(checkbox[i].value)
+                }
+            }
+        })
     }
 }
 
