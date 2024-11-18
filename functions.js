@@ -26,37 +26,47 @@ async function fetchWithTimeout(url, timeout = 3000) {
 
 async function fetchPost(option, information) {
     const sendMessage = `O documento pertence à modalidade ${option} e contém as seguintes informações: ${information}`;
-    
+
     const analyzeChatGPT = {
-        message: [
+        model: "gpt-4",
+        messages: [
             {
                 role: "system",
+                content: "Você é um assistente útil."
+            },
+            {
+                role: "user",
                 content: sendMessage
             }
-        ],
-        model: "gpt-4"
+        ]
     };
 
     try {
-        const response = await fetch('https://api.exemplo.com/endpoint', {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer YOUR_API_KEY` // Substitua pelo seu token da OpenAI
             },
             body: JSON.stringify(analyzeChatGPT)
         });
 
         if (!response.ok) {
-            throw new Error('Erro na requisição');
+            const errorData = await response.json();
+            throw new Error(`Erro ${response.status}: ${errorData.error.message}`);
         }
 
         const data = await response.json();
         console.log('Resposta recebida:', data);
-        
+
+        const aiResponse = data.choices[0].message.content;
+        console.log('Resposta do ChatGPT:', aiResponse);
+
     } catch (error) {
         errorModal("Erro", error.message);
     }
 }
+
 
 function btnActionAutenticate() {
     const btnMicrosoft = document.getElementById('btnMicrosoft');
