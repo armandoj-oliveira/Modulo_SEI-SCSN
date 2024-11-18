@@ -24,6 +24,40 @@ async function fetchWithTimeout(url, timeout = 3000) {
     }
 }
 
+async function fetchPost(option, information) {
+    const sendMessage = `O documento pertence à modalidade ${option} e contém as seguintes informações: ${information}`;
+    
+    const analyzeChatGPT = {
+        message: [
+            {
+                role: "system",
+                content: sendMessage
+            }
+        ],
+        model: "gpt-4"
+    };
+
+    try {
+        const response = await fetch('https://api.exemplo.com/endpoint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(analyzeChatGPT)
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro na requisição');
+        }
+
+        const data = await response.json();
+        console.log('Resposta recebida:', data);
+        
+    } catch (error) {
+        errorModal("Erro", error.message);
+    }
+}
+
 function btnActionAutenticate() {
     const btnMicrosoft = document.getElementById('btnMicrosoft');
 
@@ -44,7 +78,37 @@ function btnActionAnalyze() {
             analyzeModal();
         });
     } else {
-        errorModal("Algo deu errado!");
+        errorModal("Não conseguimos analisar no momento!");
+    }
+}
+
+function btnActionContinue() {
+    const btnContinue = document.getElementById('btnContinue');
+
+    if(btnContinue) {
+        btnContinue.addEventListener("click", async function () {
+
+        btnContinue.style.display = "none";
+        btnCancel.style.display = "none";
+
+        Swal.showLoading();
+
+        if(selectedOption && additionalInfo) {
+            await fetchPost(selectedOption, additionalInfo);
+        } else {
+            errorModal("Algo deu errado durante a solicitação de orientação!");
+        }});
+
+    } else {
+        errorModal("Ops, parece que não conseguimos prosseguir!");
+    }
+}
+
+function btnActionCancel() {
+    const btnCancel = document.getElementById('btnCancel');
+
+    if(btnCancel) {
+        btnCancel.addEventListener("click", () => { confirmModal() })
     }
 }
 
