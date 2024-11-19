@@ -46,7 +46,7 @@ async function fetchPost(option, information) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer YOUR_API_KEY` // Substitua pelo seu token da OpenAI
+                'Authorization': `Bearer`
             },
             body: JSON.stringify(analyzeChatGPT)
         });
