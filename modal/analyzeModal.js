@@ -3,14 +3,13 @@ let additionalInfo = "";
 
 function analyzeModal() {
     Swal.fire({
-        title: "ANALISE",
+        title: "Documento",
         html: ` 
             <hr style="border: none; height: 3px; background: linear-gradient(to right, #ff7e5f, #feb47b);">
             <br />
             <fieldset style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
-                <legend style="font-weight: bold; color: #333;">Selecione uma Modalidade</legend>
                 <div style="text-align: left; font-family: Arial, sans-serif; color: #333;">
-                    ${generateCheckboxes()}
+                    ${generateTypes()}
                 </div>
             </fieldset>
             <div style="background-color: #f0f0f0; padding: 20px; border-left: 5px solid #007acc; border-radius: 4px; margin-top: 20px; box-sizing: border-box;">
@@ -44,23 +43,56 @@ function analyzeModal() {
     });
 }
 
-function generateCheckboxes() {
+function generateTypes() {
     const options = [
-        { id: "inexigibilidade", label: "Inexigibilidade" },
-        { id: "pregao", label: "Pregão" },
-        { id: "concorrencia", label: "Concorrência" },
-        { id: "dispensa_licitacao", label: "Dispensa de Licitação" }
+        { legend: "Exemplo 1", id: "inexigibilidade", label: "Inexigibilidade", type: "radio", required: true },
+        { legend: "Exemplo 2", id: "pregao", label: "Pregão", type: "checkbox", required: false },
+        { legend: "Exemplo 3", id: "concorrencia", label: "Concorrência", type: "text", required: false },
+        { legend: "Exemplo 4", id: "dispensa_licitacao", label: "Dispensa de Licitação", type: "button", required: false },
+        { legend: "Exemplo 5", id: "tipo_selecao", label: "Tipo de Seleção", type: "select", selectOptions: ["Opção 1", "Opção 2", "Opção 3"], required: true }
     ];
 
-    return options
-        .map(option => {
-            const checked = option.id === selectedOption ? "checked" : "";
+    const groupedByLegend = options.reduce((groups, option) => {
+        groups[option.legend] = groups[option.legend] || [];
+        groups[option.legend].push(option);
+        return groups;
+    }, {});
+
+    return Object.entries(groupedByLegend)
+        .map(([legend, fields]) => {
+            const fieldHtml = fields.map(option => {
+                if (option.type === "select") {
+                    const selectOptions = option.selectOptions
+                        .map(opt => `<option value="${opt}">${opt}</option>`)
+                        .join("");
+
+                    return `
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <label for="${option.id}" style="cursor: pointer; margin-right: 10px;">${option.label}:</label>
+                            <select id="${option.id}" name="opcoes" 
+                                style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+                                ${selectOptions}
+                            </select>
+                        </div>`;
+                }
+
+                const checked = option.id === selectedOption ? "checked" : "";
+
+                return `
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <input type="${option.type}" id="${option.id}" name="opcoes" value="${option.label}" 
+                            style="margin-right: 10px; accent-color: #007bff; cursor: pointer;" ${checked}>
+                        <label for="${option.id}" style="cursor: pointer;">${option.label}</label>
+                    </div>`;
+            }).join("");
+
             return `
-                <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                    <input type="checkbox" id="${option.id}" name="opcoes" value="${option.label}" 
-                        style="margin-right: 10px; accent-color: #007bff; cursor: pointer;" ${checked}>
-                    <label for="${option.id}" style="cursor: pointer;">${option.label}</label>
-                </div>`;
+                <fieldset style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <legend style="font-weight: bold; color: #333;">${legend}</legend>
+                    <div style="text-align: left; font-family: Arial, sans-serif; color: #333;">
+                        ${fieldHtml}
+                    </div>
+                </fieldset>`;
         })
         .join("");
 }
