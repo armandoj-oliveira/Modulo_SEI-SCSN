@@ -30,46 +30,6 @@ function fetchPost() {
         icon: "sucess",
         html: "OK"
     })
-    // const sendMessage = `O documento pertence à modalidade ${option} e contém as seguintes informações: ${information}`;
-
-    // const analyzeChatGPT = {
-    //     model: "gpt-4",
-    //     messages: [
-    //         {
-    //             role: "system",
-    //             content: "Você é um assistente útil."
-    //         },
-    //         {
-    //             role: "user",
-    //             content: sendMessage
-    //         }
-    //     ]
-    // };
-
-    // try {
-    //     const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': `Bearer`
-    //         },
-    //         body: JSON.stringify(analyzeChatGPT)
-    //     });
-
-    //     if (!response.ok) {
-    //         const errorData = await response.json();
-    //         throw new Error(`Erro ${response.status}: ${errorData.error.message}`);
-    //     }
-
-    //     const data = await response.json();
-    //     console.log('Resposta recebida:', data);
-
-    //     const aiResponse = data.choices[0].message.content;
-    //     console.log('Resposta do ChatGPT:', aiResponse);
-
-    // } catch (error) {
-    //     errorModal("Erro", error.message);
-    // }
 }
 
 
@@ -121,8 +81,8 @@ function btnActionContinue() {
 
             Swal.showLoading();
 
-            if (selectedOption && additionalInfo) {
-                await fetchPost(selectedOption, additionalInfo);
+            if (selectedOption || additionalInfo) {
+                fetchPost();
             } else {
                 errorModal("Algo deu errado durante a solicitação de orientação!");
             }
