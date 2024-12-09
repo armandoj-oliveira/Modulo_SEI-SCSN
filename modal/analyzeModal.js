@@ -6,7 +6,9 @@ function analyzeModal() {
         title: "Documento",
         html: ` 
             <hr style="border: none; height: 3px; background: linear-gradient(to right, #ff7e5f, #feb47b);">
-            <br />
+            <p style="color: #ff0000; font-weight: bold; font-size: 0.9em; margin-bottom: 10px;">
+                Os campos marcados com * são obrigatórios.
+            </p>
             <fieldset style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
                 <div style="text-align: left; font-family: Arial, sans-serif; color: #333;">
                     ${generateTypes()}
@@ -36,7 +38,7 @@ function analyzeModal() {
         showConfirmButton: false,
         showCancelButton: false,
         didOpen: () => {
-            handleModalInteractions(); 
+            handleModalInteractions();
             btnActionContinue();
             btnActionCancel();
         }
@@ -45,10 +47,7 @@ function analyzeModal() {
 
 function generateTypes() {
     const options = [
-        { legend: "Exemplo 1", id: "inexigibilidade", label: "Inexigibilidade", type: "radio", required: true },
-        { legend: "Exemplo 2", id: "pregao", label: "Pregão", type: "checkbox", required: false },
-        { legend: "Exemplo 3", id: "concorrencia", label: "Concorrência", type: "text", required: false },
-        { legend: "Exemplo 4", id: "dispensa_licitacao", label: "Dispensa de Licitação", type: "button", required: false },
+        { legend: "Exemplo 1", id: "inexigibilidade", label: "Inexigibilidade", type: "text", required: true },
         { legend: "Exemplo 5", id: "tipo_selecao", label: "Tipo de Seleção", type: "select", selectOptions: ["Opção 1", "Opção 2", "Opção 3"], required: true }
     ];
 
@@ -61,6 +60,10 @@ function generateTypes() {
     return Object.entries(groupedByLegend)
         .map(([legend, fields]) => {
             const fieldHtml = fields.map(option => {
+                const label = option.required 
+                    ? `<label for="${option.id}" style="cursor: pointer; margin-right: 10px;">${option.label} <span style="color: red;">*</span>:</label>` 
+                    : `<label for="${option.id}" style="cursor: pointer; margin-right: 10px;">${option.label}:</label>`;
+
                 if (option.type === "select") {
                     const selectOptions = option.selectOptions
                         .map(opt => `<option value="${opt}">${opt}</option>`)
@@ -68,21 +71,22 @@ function generateTypes() {
 
                     return `
                         <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                            <label for="${option.id}" style="cursor: pointer; margin-right: 10px;">${option.label}:</label>
+                            ${label}
                             <select id="${option.id}" name="opcoes" 
-                                style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+                                style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;" 
+                                ${option.required ? "required" : ""}>
+                                <option value="">Selecione uma opção</option>
                                 ${selectOptions}
                             </select>
                         </div>`;
                 }
 
-                const checked = option.id === selectedOption ? "checked" : "";
-
                 return `
                     <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                        <input type="${option.type}" id="${option.id}" name="opcoes" value="${option.label}" 
-                            style="margin-right: 10px; accent-color: #007bff; cursor: pointer;" ${checked}>
-                        <label for="${option.id}" style="cursor: pointer;">${option.label}</label>
+                        ${label}
+                        <input type="${option.type}" id="${option.id}" name="opcoes" 
+                            style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;"
+                            ${option.required ? "required" : ""}>
                     </div>`;
             }).join("");
 

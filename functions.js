@@ -24,47 +24,52 @@ async function fetchWithTimeout(url, timeout = 3000) {
     }
 }
 
-async function fetchPost(option, information) {
-    const sendMessage = `O documento pertence à modalidade ${option} e contém as seguintes informações: ${information}`;
+function fetchPost() {
 
-    const analyzeChatGPT = {
-        model: "gpt-4",
-        messages: [
-            {
-                role: "system",
-                content: "Você é um assistente útil."
-            },
-            {
-                role: "user",
-                content: sendMessage
-            }
-        ]
-    };
+    Swal.fire({
+        icon: "sucess",
+        html: "OK"
+    })
+    // const sendMessage = `O documento pertence à modalidade ${option} e contém as seguintes informações: ${information}`;
 
-    try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer`
-            },
-            body: JSON.stringify(analyzeChatGPT)
-        });
+    // const analyzeChatGPT = {
+    //     model: "gpt-4",
+    //     messages: [
+    //         {
+    //             role: "system",
+    //             content: "Você é um assistente útil."
+    //         },
+    //         {
+    //             role: "user",
+    //             content: sendMessage
+    //         }
+    //     ]
+    // };
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Erro ${response.status}: ${errorData.error.message}`);
-        }
+    // try {
+    //     const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': `Bearer`
+    //         },
+    //         body: JSON.stringify(analyzeChatGPT)
+    //     });
 
-        const data = await response.json();
-        console.log('Resposta recebida:', data);
+    //     if (!response.ok) {
+    //         const errorData = await response.json();
+    //         throw new Error(`Erro ${response.status}: ${errorData.error.message}`);
+    //     }
 
-        const aiResponse = data.choices[0].message.content;
-        console.log('Resposta do ChatGPT:', aiResponse);
+    //     const data = await response.json();
+    //     console.log('Resposta recebida:', data);
 
-    } catch (error) {
-        errorModal("Erro", error.message);
-    }
+    //     const aiResponse = data.choices[0].message.content;
+    //     console.log('Resposta do ChatGPT:', aiResponse);
+
+    // } catch (error) {
+    //     errorModal("Erro", error.message);
+    // }
 }
 
 
@@ -82,7 +87,7 @@ function btnActionAutenticate() {
 
 function btnActionAnalyze() {
     const btnAnalyze = document.getElementById('btnAnalyze');
-    
+
     if(btnAnalyze) {
         btnAnalyze.addEventListener("click", function () {
             analyzeModal();
@@ -94,25 +99,39 @@ function btnActionAnalyze() {
 
 function btnActionContinue() {
     const btnContinue = document.getElementById('btnContinue');
+    const requiredFields = document.querySelectorAll("[required]");
 
-    if(btnContinue) {
+    if (btnContinue) {
         btnContinue.addEventListener("click", async function () {
+            const allFieldsValid = Array.from(requiredFields).every(field => {
+                if (field.tagName === "SELECT") {
+                    return field.value !== "";
+                }
+                return field.value.trim() !== "";
+            });
 
-        btnContinue.style.display = "none";
-        btnCancel.style.display = "none";
+            if (!allFieldsValid) {
+                errorModal("Por favor, preencha todos os campos obrigatórios antes de continuar.");
+                return;
+            }
 
-        Swal.showLoading();
+            btnContinue.style.display = "none";
+            const btnCancel = document.getElementById('btnCancel');
+            if (btnCancel) btnCancel.style.display = "none";
 
-        if(selectedOption && additionalInfo) {
-            await fetchPost(selectedOption, additionalInfo);
-        } else {
-            errorModal("Algo deu errado durante a solicitação de orientação!");
-        }});
+            Swal.showLoading();
 
+            if (selectedOption && additionalInfo) {
+                await fetchPost(selectedOption, additionalInfo);
+            } else {
+                errorModal("Algo deu errado durante a solicitação de orientação!");
+            }
+        });
     } else {
         errorModal("Ops, parece que não conseguimos prosseguir!");
     }
 }
+
 
 function btnActionCancel() {
     const btnCancel = document.getElementById('btnCancel');
@@ -148,7 +167,7 @@ function renderAnalysisHistory() {
         border-collapse: collapse;
         margin-top: 20px;
     `;
-    
+
     const thTdStyle = `
         border: 1px solid #ddd;
         padding: 8px;
@@ -159,7 +178,7 @@ function renderAnalysisHistory() {
         background-color: #f4f4f4;
     `;
 
-    const analysisHistory = [ 
+    const analysisHistory = [
         { docName: "Memorando Exemplo", docStatus: "Analisado", timestamp: "2024-10-01 14:30", link: "https://example.com/memorando" },
         { docName: "Termo de Referência Exemplo", docStatus: "Não analisado", timestamp: "", link: "https://example.com/termo" }
     ];
