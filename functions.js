@@ -24,11 +24,53 @@ async function fetchWithTimeout(url, timeout = 3000) {
     }
 }
 
-function fetchPost() {
+function fetchPost(option, information) {
 
     Swal.fire({
+
+    // const sendMessage = `O documento pertence à modalidade ${option} e contém as seguintes informações: ${information}`;
+
+    // const analyzeChatGPT = {
+    //     model: "gpt-4",
+    //     messages: [
+    //         {
+    //             role: "system",
+    //             content: "Você é um assistente útil."
+    //         },
+    //         {
+    //             role: "user",
+    //             content: sendMessage
+    //         }
+    //     ]
+    // };
+
+    // try {
+    //     const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': `Bearer`
+    //         },
+    //         body: JSON.stringify(analyzeChatGPT)
+    //     });
+
+    //     if (!response.ok) {
+    //         const errorData = await response.json();
+    //         throw new Error(`Erro ${response.status}: ${errorData.error.message}`);
+    //     }
+
+    //     const data = await response.json();
+    //     console.log('Resposta recebida:', data);
+
+    //     const aiResponse = data.choices[0].message.content;
+    //     console.log('Resposta do ChatGPT:', aiResponse);
+
+    // } catch (error) {
+    //     errorModal("Erro", error.message);
+    // }
+
         icon: "sucess",
-        html: "OK"
+        html: `Option: ${option} <br /> Information: ${information}`
     })
 }
 
@@ -54,65 +96,6 @@ function btnActionAnalyze() {
         });
     } else {
         errorModal("Não conseguimos analisar no momento!");
-    }
-}
-
-function btnActionContinue() {
-    const btnContinue = document.getElementById('btnContinue');
-    const requiredFields = document.querySelectorAll("[required]");
-
-    if (btnContinue) {
-        btnContinue.addEventListener("click", async function () {
-            const allFieldsValid = Array.from(requiredFields).every(field => {
-                if (field.tagName === "SELECT") {
-                    return field.value !== "";
-                }
-                return field.value.trim() !== "";
-            });
-
-            if (!allFieldsValid) {
-                errorModal("Por favor, preencha todos os campos obrigatórios antes de continuar.");
-                return;
-            }
-
-            btnContinue.style.display = "none";
-            const btnCancel = document.getElementById('btnCancel');
-            if (btnCancel) btnCancel.style.display = "none";
-
-            Swal.showLoading();
-
-            if (selectedOption || additionalInfo) {
-                fetchPost();
-            } else {
-                errorModal("Algo deu errado durante a solicitação de orientação!");
-            }
-        });
-    } else {
-        errorModal("Ops, parece que não conseguimos prosseguir!");
-    }
-}
-
-
-function btnActionCancel() {
-    const btnCancel = document.getElementById('btnCancel');
-
-    if(btnCancel) {
-        btnCancel.addEventListener("click", () => { confirmModal() })
-    }
-}
-
-function valueCheckbox() {
-    const btnContinue = document.getElementById('btnContinue');
-    const checkbox = document.querySelectorAll('input[type="checkbox"]');
-
-    if(btnContinue){
-        btnContinue.addEventListener("click", function () {
-            for(let i = 0; i < checkbox.length; i++) {
-                if(checkbox[i].checked) {
-                    console.log(checkbox[i].value)
-                }
-            }
-        })
     }
 }
 
